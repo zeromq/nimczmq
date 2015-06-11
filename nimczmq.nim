@@ -48,4 +48,4 @@ proc zframe_destroy*(frame_p: pointer) {.cdecl, importc: "zframe_destroy", dynli
 
 proc zstr_send*(sock: PSock, str: cstring): cint {.cdecl, importc: "zstr_send", dynlib: czmqdll.}
 proc zstr_recv*(sock: PSock): cstring {.cdecl, importc: "zstr_recv", dynlib: czmqdll.}
-proc zstr_free*(zstr_p: pointer): cstring {.cdecl, importc: "zstr_free", dynlib: czmqdll.}
+proc zstr_free*(zstr_p: pointer) {.cdecl, importc: "zstr_free", dynlib: czmqdll.}

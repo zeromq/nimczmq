@@ -13,9 +13,9 @@ suite "zstr":
         rc = zstr_send(push, "Hello")
         check (rc == 0)
        
-        var msg = zstr_recv(pull)
+        var str = zstr_recv(pull)
+        check ($str == "Hello")
 
-        check ($msg == "Hello")
-
+        zstr_free(addr(str))
         zsock_destroy(addr(push))
         zsock_destroy(addr(pull))
