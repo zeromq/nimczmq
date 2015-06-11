@@ -1,7 +1,11 @@
 # nimczmq
 Nim ( http://nim-lang.org/ ) bindings for CZMQ
 
-# Usage
+## Status
+Just getting started!  Enough of zsock, zframe, and zstr wrapped 
+to send and receive some messages.
+
+## Usage
 ```nim
 import nimczmq
 
