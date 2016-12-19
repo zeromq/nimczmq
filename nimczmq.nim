@@ -1,13 +1,13 @@
 {.deadCodeElim: on.}
-when defined(windows):
-  const 
-    czmqdll* = "czmq.dll"
-elif defined(macosx):
-  const 
-    czmqdll* = "libczmq.dylib"
+
+when defined(Windows):
+    const czmqLib = "czmq.dll"
+elif defined(MacOsx):
+    const czmqLib = "libczmq.dynlib"
 else:
-  const 
-    czmqdll* = "libczmq.so"
+    const czmqLib = "libczmq.so"
+
+{.push dynlib: czmqLib.}
 
 const 
   ZMQ_PAIR* = 0
@@ -22,30 +22,39 @@ const
   ZMQ_XPUB* = 9
   ZMQ_XSUB* = 10
   ZMQ_STREAM* = 11
+  ZMQ_SERVER* = 12
+  ZMQ_CLIENT* = 13
+  ZMQ_RADIO* = 14
+  ZMQ_DISH* = 15
+  ZMQ_GATHER* = 16
+  ZMQ_SCATTER* = 17
+  ZMQ_DGRAM* = 18
 
 type
     TSock {.final, pure.} = object
     PSock* = ptr TSock
 
-proc zsock_new*(sockType: cint): PSock {.cdecl, importc: "zsock_new", dynlib: czmqdll.}
-proc zsock_connect*(sock: PSock, endpoint: cstring): cint {.cdecl, importc: "zsock_connect", dynlib: czmqdll.}
-proc zsock_bind*(sock: PSock, endpoint: cstring): cint {.cdecl, importc: "zsock_bind", dynlib: czmqdll.}
-proc zsock_destroy*(sock_p: pointer) {.cdecl, importc: "zsock_destroy", dynlib: czmqdll.}
+proc zsock_new*(sockType: cint): PSock {.importc: "zsock_new".}
+proc zsock_connect*(sock: PSock, endpoint: cstring): cint {.importc: "zsock_connect".}
+proc zsock_bind*(sock: PSock, endpoint: cstring): cint {.importc: "zsock_bind".}
+proc zsock_destroy*(sock_p: pointer) {.importc: "zsock_destroy".}
 
 type
     TFrame {.final, pure.} = object
     PFrame* = ptr TFRame
 
-proc zframe_new*(data: cstring, size: int): PFrame {.cdecl, importc: "zframe_new", dynlib: czmqdll.}
-proc zframe_new_empty*(): PFrame {.cdecl, importc: "zframe_new_empty", dynlib: czmqdll.}
-proc zframe_from*(str: cstring): PFrame {.cdecl, importc: "zframe_from", dynlib: czmqdll.}
-proc zframe_size*(frame: PFrame): cint {.cdecl, importc: "zframe_size", dynlib: czmqdll.}
-proc zframe_dup*(frame: PFrame): PFrame {.cdecl, importc: "zframe_dup", dynlib: czmqdll.}
-proc zframe_strdup*(frame: PFrame): cstring {.cdecl, importc: "zframe_strdup", dynlib: czmqdll.}
-proc zframe_send*(frame_p: pointer, sock: PSock, flags: int): cint {.cdecl, importc: "zframe_send", dynlib: czmqdll.}
-proc zframe_recv*(sock: PSock): PFrame {.cdecl, importc: "zframe_recv", dynlib: czmqdll.}
-proc zframe_destroy*(frame_p: pointer) {.cdecl, importc: "zframe_destroy", dynlib: czmqdll.}
+proc zframe_new*(data: cstring, size: int): PFrame {.importc: "zframe_new".}
+proc zframe_new_empty*(): PFrame {.importc: "zframe_new_empty".}
+proc zframe_from*(str: cstring): PFrame {.importc: "zframe_from".}
+proc zframe_size*(frame: PFrame): cint {.importc: "zframe_size".}
+proc zframe_dup*(frame: PFrame): PFrame {.importc: "zframe_dup".}
+proc zframe_strdup*(frame: PFrame): cstring {.importc: "zframe_strdup".}
+proc zframe_send*(frame_p: pointer, sock: PSock, flags: int): cint {.importc: "zframe_send".}
+proc zframe_recv*(sock: PSock): PFrame {.importc: "zframe_recv".}
+proc zframe_destroy*(frame_p: pointer) {.importc: "zframe_destroy".}
 
-proc zstr_send*(sock: PSock, str: cstring): cint {.cdecl, importc: "zstr_send", dynlib: czmqdll.}
-proc zstr_recv*(sock: PSock): cstring {.cdecl, importc: "zstr_recv", dynlib: czmqdll.}
-proc zstr_free*(zstr_p: pointer) {.cdecl, importc: "zstr_free", dynlib: czmqdll.}
+proc zstr_send*(sock: PSock, str: cstring): cint {.importc: "zstr_send".}
+proc zstr_recv*(sock: PSock): cstring {.importc: "zstr_recv".}
+proc zstr_free*(zstr_p: pointer) {.importc: "zstr_free".}
+
+{.pop.}

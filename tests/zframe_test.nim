@@ -40,18 +40,18 @@ suite "zframe":
         var frame = zframe_new("Hello", 5)
         var push = zsock_new(ZMQ_PUSH)
         var rc = zsock_bind(push, "inproc://zsock_test")
-        check (rc == 0)
+        check(rc == 0)
        
         var pull = zsock_new(ZMQ_PULL)
         rc = zsock_connect(pull, "inproc://zsock_test")
-        check (rc == 0)
+        check(rc == 0)
 
         rc = zframe_send(addr(frame), push, 0)
-        check (rc == 0)
+        check(rc == 0)
 
         var recvd = zframe_recv(pull)
         var msg = zframe_strdup(recvd)
-        check ($msg == "Hello")
+        check($msg == "Hello")
 
         zframe_destroy(addr(recvd))
         zsock_destroy(addr(push))
