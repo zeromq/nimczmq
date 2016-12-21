@@ -9,35 +9,70 @@ else:
 
 {.push dynlib: czmqLib.}
 
-const 
-  ZMQ_PAIR* = 0
-  ZMQ_PUB* = 1
-  ZMQ_SUB* = 2
-  ZMQ_REQ* = 3
-  ZMQ_REP* = 4
-  ZMQ_DEALER* = 5
-  ZMQ_ROUTER* = 6
-  ZMQ_PULL* = 7
-  ZMQ_PUSH* = 8
-  ZMQ_XPUB* = 9
-  ZMQ_XSUB* = 10
-  ZMQ_STREAM* = 11
-  ZMQ_SERVER* = 12
-  ZMQ_CLIENT* = 13
-  ZMQ_RADIO* = 14
-  ZMQ_DISH* = 15
-  ZMQ_GATHER* = 16
-  ZMQ_SCATTER* = 17
-  ZMQ_DGRAM* = 18
+const
+    ZMQ_PAIR* = 0
+    ZMQ_PUB* = 1
+    ZMQ_SUB* = 2
+    ZMQ_REQ* = 3
+    ZMQ_REP* = 4
+    ZMQ_DEALER* = 5
+    ZMQ_ROUTER* = 6
+    ZMQ_PULL* = 7
+    ZMQ_PUSH* = 8
+    ZMQ_XPUB* = 9
+    ZMQ_XSUB* = 10
+    ZMQ_STREAM* = 11
+    ZMQ_SERVER* = 12
+    ZMQ_CLIENT* = 13
+    ZMQ_RADIO* = 14
+    ZMQ_DISH* = 15
+    ZMQ_GATHER* = 16
+    ZMQ_SCATTER* = 17
+    ZMQ_DGRAM* = 18
 
+# zsock - high-level socket API that hides libzmq contexts and sockets
 type
     TSock {.final, pure.} = object
     PSock* = ptr TSock
 
+# Create a new socket. Returns the new socket, or NULL if the new socket
+# could not be created.
 proc zsock_new*(sockType: cint): PSock {.importc: "zsock_new".}
-proc zsock_connect*(self: PSock, endpoint: cstring): cint {.importc: "zsock_connect".}
-proc zsock_bind*(self: PSock, endpoint: cstring): cint {.importc: "zsock_bind".}
+
+# Destroy the socket. You must use this for any socket created via the
+# zsock_new method
 proc zsock_destroy*(self_p: pointer) {.importc: "zsock_destroy".}
+
+# Bind a socket to a formatted endpoint. For tcp:// endpoints, supports   
+# ephemeral ports, if you specify the port number as "*". By default      
+# zsock uses the IANA designated range from C000 (49152) to FFFF (65535). 
+# To override this range, follow the "*" with "[first-last]". Either or   
+# both first and last may be empty. To bind to a random port within the   
+# range, use "!" in place of "*".                                         
+#
+# Examples:                                                               
+#  tcp://127.0.0.1:*           bind to first free port from C000 up    
+#  tcp://127.0.0.1:!           bind to random port from C000 to FFFF   
+#  tcp://127.0.0.1:*[60000-]   bind to first free port from 60000 up   
+#  tcp://127.0.0.1:![-60000]   bind to random port from C000 to 60000  
+#  tcp://127.0.0.1:![55000-55999]                                      
+#
+# On success, returns the actual port number used, for tcp:// endpoints,  
+# and 0 for other transports. On failure, returns -1. Note that when using
+# ephemeral ports, a port may be reused by different services without     
+# clients being aware. Protocols that run on ephemeral ports should take  
+# this into account.                                                      
+proc zsock_bind*(self: PSock, endpoint: cstring): cint {.importc: "zsock_bind", discardable.}
+
+# Connect a socket to a formatted endpoint        
+# Returns 0 if OK, -1 if the endpoint was invalid.
+proc zsock_connect*(self: PSock, endpoint: cstring): cint {.importc: "zsock_connect", discardable.}
+
+# Disconnect a socket from a formatted endpoint                  
+# Returns 0 if OK, -1 if the endpoint was invalid or the function
+# isn't supported.                         
+proc zsock_disconnect*(self: PSock, format: cstring): cint {.importc: "zsock_disconnect", varargs, discardable.}
+
 
 type
     TFrame {.final, pure.} = object

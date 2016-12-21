@@ -39,10 +39,12 @@ suite "zframe":
     test "send and receive frame":
         var frame = zframe_new("Hello", 5)
         var push = zsock_new(ZMQ_PUSH)
+        check(push != nil)
         var rc = zsock_bind(push, "inproc://zsock_test")
         check(rc == 0)
        
         var pull = zsock_new(ZMQ_PULL)
+        check(pull != nil)
         rc = zsock_connect(pull, "inproc://zsock_test")
         check(rc == 0)
 
