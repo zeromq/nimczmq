@@ -29,6 +29,8 @@ const
     ZMQ_GATHER* = 16
     ZMQ_SCATTER* = 17
     ZMQ_DGRAM* = 18
+    ZMQ_MORE* = 1
+    ZMQ_NOMORE* = 0
 
 # zsock - high-level socket API that hides libzmq contexts and sockets
 type
@@ -38,6 +40,43 @@ type
 # Create a new socket. Returns the new socket, or NULL if the new socket
 # could not be created.
 proc zsock_new*(sockType: cint): PSock {.importc: "zsock_new".}
+
+# Create a PUB socket. Default action is bind.
+proc zsock_new_pub*(endpoint: cstring): PSock {.importc: "zsock_new_pub".}
+
+# Create a SUB socket, and optionally subscribe to some prefix string. Default
+# action is connect.
+proc zsock_new_sub*(endpoint, subscribe: cstring): PSock {.importc: "zsock_new_sub".}
+
+# Create a REQ socket. Default action is connect.
+proc zsock_new_req*(endpoint: cstring): PSock {.importc: "zsock_new_req".}
+
+# Create a REP socket. Default action is bind.
+proc zsock_new_rep*(endpoint: cstring): PSock {.importc: "zsock_new_rep".}
+
+# Create a DEALER socket. Default action is connect.
+proc zsock_new_dealer*(endpoint: cstring): PSock {.importc: "zsock_new_dealer".}
+
+# Create a ROUTER socket. Default action is bind.
+proc zsock_new_router*(endpoint: cstring): PSock {.importc: "zsock_new_router".}
+
+# Create a PUSH socket. Default action is connect.
+proc zsock_new_push*(endpoint: cstring): PSock {.importc: "zsock_new_push".}
+
+# Create a PULL socket. Default action is bind.
+proc zsock_new_pull*(endpoint: cstring): PSock {.importc: "zsock_new_pull".}
+
+# Create an XPUB socket. Default action is bind.
+proc zsock_new_xpub*(endpoint: cstring): PSock {.importc: "zsock_new_xpub".}
+
+# Create an XSUB socket. Default action is connect.
+proc zsock_new_xsub*(endpoint: cstring): PSock {.importc: "zsock_new_xsub".}
+
+# Create a PAIR socket. Default action is connect.
+proc zsock_new_pair*(endpoint: cstring): PSock {.importc: "zsock_new_pair".}
+
+# Create a STREAM socket. Default action is connect.
+proc zsock_new_stream*(endpoint: cstring): PSock {.importc: "zsock_new_stream".}
 
 # Destroy the socket. You must use this for any socket created via the
 # zsock_new method
