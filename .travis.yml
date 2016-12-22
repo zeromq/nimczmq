@@ -2,15 +2,11 @@ language: c
 env:
   # Build and test against the master and devel branches of Nim
   - BRANCH=master
-  - BRANCH=devel
 compiler:
   # Build and test using both gcc and clang
   - gcc
   - clang
 matrix:
-  allow_failures:
-    # Ignore failures when building against the devel Nim branch
-    - env: BRANCH=devel
   fast_finish: true
 install:
   - |
@@ -42,7 +38,6 @@ script:
 cache:
   directories:
     - nim-master
-    - nim-devel
 branches:
   except:
     - gh-pages
