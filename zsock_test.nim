@@ -9,6 +9,39 @@ suite "zsock":
         zsock_destroy(addr(sock))
         check(sock == nil)
 
+    test "zsock_bind, zsock_unbind, zsock_endpoint":
+
+        # Create a ZMQ_PULL socket and bind it to an endpoint.
+        var pull = zsock_new(ZMQ_PULL)
+        check (pull != nil)
+  
+        var rc = zsock_bind(pull, "inproc://test_bind_unbind1")
+        check(rc == 0)
+
+        # Verify zsock_endpoint returns the last endpoint we bound to.
+        var endpoint = zsock_endpoint(pull)
+        check(endpoint == "inproc://test_bind_unbind1")
+
+        # Bind the socket to a second enpoint.
+        rc = zsock_bind(pull, "inproc://test_bind_unbind2")
+        check(rc == 0)
+
+        # Verify zsock_endpoint returns the last endpoint we bound to.
+        endpoint = zsock_endpoint(pull)
+        check(endpoint == "inproc://test_bind_unbind2")
+
+        # Unbind from an endpoint. Successful unbind should return 0.
+        rc = zsock_unbind(pull, "inproc://test_bind_unbind2")
+        check(rc == 0)
+
+        # Unbind from an endpoint we never bound to. Unsuccessful unbind should return -1.
+        rc = zsock_unbind(pull, "inproc://thiswasneverbound")
+        check(rc == -1)
+ 
+        # Destroy the socket.
+        zsock_destroy(addr(pull))
+        check(pull == nil)
+
     test "zsock_new_pub and zsock_new_sub":
 
         # Create a ZMQ_PUB socket and connect to an in memory endpoint.
@@ -41,6 +74,7 @@ suite "zsock":
         check(pub == nil)
     
     test "zsock_new_rep and zsock_new_req":
+
         # Create a ZMQ_REP socket and connect to an in memory endpoint.
         var rep = zsock_new_rep("inproc://new_rep_req_test")
         check(rep != nil)
@@ -80,6 +114,7 @@ suite "zsock":
         check(req == nil)
 
     test "zsock_new_dealer and zsock_new_router":
+        
         # Create a ZMQ_ROUTER socket and connect to an in memory endpoint.
         var router = zsock_new_router("inproc://new_dealer_router_test")
         check(router != nil)
@@ -148,6 +183,7 @@ suite "zsock":
         check(router == nil)
     
     test "zsock_new_push and zsock_new_pull":
+        
         # Create a ZMQ_PULL socket and connect to an in memory endpoint.
         var pull = zsock_new_pull("inproc://new_push_pull_test")
         check(pull != nil)
@@ -175,6 +211,7 @@ suite "zsock":
         check(pull == nil)
 
     test "zsock_new_xpub and zsock_new_sub":
+        
         # Create a ZMQ_XPUB socket and bind to an in memory endpoint.
         var xpub = zsock_new_xpub("inproc://new_xpub_sub_test")
         check(xpub != nil)
@@ -202,6 +239,7 @@ suite "zsock":
         check(xpub == nil)
 
     test "zsock_new_pair":
+        
         # Create a ZMQ_PAIR socket and bind to an in memory endpoint.
         var pair1 = zsock_new_pair("@inproc://new_pair_test")
         check(pair1 != nil)
@@ -227,3 +265,27 @@ suite "zsock":
         check(pair1 == nil)
         zsock_destroy(addr(pair2))
         check(pair2 == nil)
+
+    test "zsock_attach":
+
+        # Create a new ZMQ_PULL socket using zsock_new.
+        var pull =  zsock_new(ZMQ_PULL)
+        check(pull != nil)
+
+        # Attach it to an endpoint, setting serverish to true.
+        var rc = zsock_attach(pull, "inproc://attach_test", true)
+        check(rc == 0)
+
+        # Create a new ZMQ_PUSH socket using zsock_new.
+        var push = zsock_new(ZMQ_PUSH)
+        check(push != nil)
+
+        # Attach it to an endpoint, setting serverish to false.
+        rc = zsock_attach(push, "inproc://attach_test", false)
+        check(rc == 0)
+
+        # Destroy the sockets.
+        zsock_destroy(addr(push))
+        check(push == nil)
+        zsock_destroy(addr(pull))
+        check(pull == nil)
