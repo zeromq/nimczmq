@@ -173,3 +173,57 @@ suite "zsock":
         check(push == nil)
         zsock_destroy(addr(pull))
         check(pull == nil)
+
+    test "zsock_new_xpub and zsock_new_sub":
+        # Create a ZMQ_XPUB socket and bind to an in memory endpoint.
+        var xpub = zsock_new_xpub("inproc://new_xpub_sub_test")
+        check(xpub != nil)
+
+        # Create a ZMQ_SUB socket and connect to an in memory endpoint.
+        var sub = zsock_new_sub("inproc://new_xpub_sub_test", "")
+        check(sub != nil)
+ 
+        # Send a message from the ZMQ_XPUB socket back to the ZMQ_SUB socket.
+        var rc = zstr_send(xpub, "Hello")
+        check(rc == 0)
+
+        # Receive the response.
+        var str = zstr_recv(sub)
+        check($str == "Hello")
+
+        # The caller is responsible for freeing a string created via zstr_recv.
+        zstr_free(addr(str))
+        check(str == nil)
+
+        # Destroy the sockets.
+        zsock_destroy(addr(sub))
+        check(sub == nil)
+        zsock_destroy(addr(xpub))
+        check(xpub == nil)
+
+    test "zsock_new_pair":
+        # Create a ZMQ_PAIR socket and bind to an in memory endpoint.
+        var pair1 = zsock_new_pair("@inproc://new_pair_test")
+        check(pair1 != nil)
+
+        # Create a ZMQ_PAIR socket and connect to an in memory endpoint.
+        var pair2 = zsock_new_pair(">inproc://new_pair_test")
+        check(pair2 != nil)
+ 
+        # Send a message between the ZMQ_PAIR sockets
+        var rc = zstr_send(pair1, "Hello")
+        check(rc == 0)
+
+        # Receive the response.
+        var str = zstr_recv(pair2)
+        check($str == "Hello")
+
+        # The caller is responsible for freeing a string created via zstr_recv.
+        zstr_free(addr(str))
+        check(str == nil)
+
+        # Destroy the sockets.
+        zsock_destroy(addr(pair1))
+        check(pair1 == nil)
+        zsock_destroy(addr(pair2))
+        check(pair2 == nil)
