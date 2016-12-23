@@ -78,6 +78,9 @@ proc zsock_new_pair*(endpoint: cstring): PSock {.importc: "zsock_new_pair".}
 # Create a STREAM socket. Default action is connect.
 proc zsock_new_stream*(endpoint: cstring): PSock {.importc: "zsock_new_stream".}
 
+# Set socket ZMQ_SUBSCRIBE value
+proc zsock_set_subscribe*(self: PSock, subscribe: cstring) {.importc: "zsock_set_subscribe".}
+
 # Destroy the socket. You must use this for any socket created via the
 # zsock_new method
 proc zsock_destroy*(self_p: pointer) {.importc: "zsock_destroy".}
@@ -100,18 +103,33 @@ proc zsock_destroy*(self_p: pointer) {.importc: "zsock_destroy".}
 # and 0 for other transports. On failure, returns -1. Note that when using
 # ephemeral ports, a port may be reused by different services without     
 # clients being aware. Protocols that run on ephemeral ports should take  
-# this into account.                                                      
+# this into account.
 proc zsock_bind*(self: PSock, endpoint: cstring): cint {.importc: "zsock_bind", discardable.}
+
+# Returns last bound endpoint, if any.
+proc zsock_endpoint*(self: Psock): cstring {.importc: "zsock_endpoint".}
+
+# Unbind a socket from a formatted endpoint.
+# Returns 0 if OK, -1 if the endpoint was invalid or the function
+# isn't supported.
+proc zsock_unbind*(self: Psock, format: cstring): cint {.importc: "zsock_unbind", varargs, discardable.}
 
 # Connect a socket to a formatted endpoint        
 # Returns 0 if OK, -1 if the endpoint was invalid.
-proc zsock_connect*(self: PSock, endpoint: cstring): cint {.importc: "zsock_connect", discardable.}
+proc zsock_connect*(self: PSock, format: cstring): cint {.importc: "zsock_connect", varargs, discardable.}
 
 # Disconnect a socket from a formatted endpoint                  
 # Returns 0 if OK, -1 if the endpoint was invalid or the function
 # isn't supported.                         
 proc zsock_disconnect*(self: PSock, format: cstring): cint {.importc: "zsock_disconnect", varargs, discardable.}
 
+# Attach a socket to zero or more endpoints. If endpoints is not null,
+# parses as list of ZeroMQ endpoints, separated by commas, and prefixed by
+# '@' (to bind the socket) or '>' (to connect the socket). Returns 0 if all
+# endpoints were valid, or -1 if there was a syntax error. If the endpoint
+# does not start with '@' or '>', the serverish argument defines whether
+# it is used to bind (serverish = true) or connect (serverish = false).
+proc zsock_attach*(self: PSock, endpoints: cstring, serverish: bool): cint {.importc: "zsock_attach", discardable.}
 
 type
     TFrame {.final, pure.} = object
